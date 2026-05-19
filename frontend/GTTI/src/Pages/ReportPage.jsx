@@ -46,29 +46,31 @@ function ReportPage () {
                 <tbody>
                     {food?.map((f) => {
                         const importData = iport.find(
-                            (i) => i.Food === f._id
+                            (i) => i.Food?._id === f._id
                         );
 
                         const exportData = eport.find(
-                            (o) => o.Food === f._id
+                            (o) => o.Food._id === f._id
                         )
                         return(
                             <tr key={f._id}>
                                 <td>{f._id}</td>
                                 <td>{f.Food_Name}</td>
                                 <td>{f.OwnerName}</td>
-                                <td>{f.ImportDate}</td>
                                 <td>{
                                     importData
-                                    ? new Date(importData.ImportDate).toLocaleDateString() : "No Import"
+                                    ? new Date(importData.ImportDate).toLocaleDateString()
+                                    : "No Import"
                                     }
                                     </td>
-                                <td>{f.ExportDate}</td>
+                                    <td>{importData?.Quantity || "No Import"}</td>
                                 <td>{
                                     exportData
-                                    ? new Date(exportData.ExportDate).toLocaleDateString() : "No Exports"
+                                    ? new Date(exportData.ExportDate).toLocaleDateString()
+                                    : "No Exports"
                                     }
                                     </td>
+                                    <td>{exportData?.Quantity || "No Exports"}</td>
                             </tr>
                         )
                     })}

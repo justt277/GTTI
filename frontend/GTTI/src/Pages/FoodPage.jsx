@@ -11,7 +11,7 @@ function FoodPage() {
 
     const fetchFood = async () => {
        const response =  await gotFoods();
-       setFood(response.data.gotFoods)
+       setFood(response.data.data)
     };
 
     useEffect(() => {

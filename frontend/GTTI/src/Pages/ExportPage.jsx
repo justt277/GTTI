@@ -11,7 +11,7 @@ function    ExportPage() {
 
     const fetchExport = async () => {
        const response =  await getExports();
-       setEport(response.data.gotExports)
+       setEport(response.data.data )
     };
 
     useEffect(() => {
