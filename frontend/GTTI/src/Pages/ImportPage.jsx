@@ -1,127 +1,145 @@
 import { useState, useEffect } from "react";
-import { createImport, gotImports, updateImport, deleteImport } from "../Api/ImportApi.js";
-import { FaEdit, FaTrash , FaPlus} from "react-icons/fa";
+import {
+  createImport,
+  gotImports,
+  updateImport,
+  deleteImport,
+} from "../Api/ImportApi.js";
 
-function    ImportPage() {
-    const [form, setForm ] = useState({
-        Food: "",
-        Quantity: ""
-    })
-    const [iport, setIport ] = useState([]);
+import NavBar from "../Components/NavBar.jsx";
+import { FaPlus, FaEdit, FaTrash, FaBoxOpen } from "react-icons/fa";
 
-    const fetchExport = async () => {
-        try {
-       const response =  await gotImports();
-       setIport(response.data.gotImports);
-       } catch (error) {
-        console.log(error);
+function ImportPage() {
+  const [form, setForm] = useState({
+    Food: "",
+    Quantity: "",
+  });
 
-       }
-    };
+  const [iport, setIport] = useState([]);
 
-    useEffect(() => {
-        fetchExport();
-    }, []);
+  const fetchData = async () => {
+    const res = await gotImports();
+    setIport(res.data.data);
+  };
 
-    const handleSubmit = async (e) => {
-        try {
-            e.preventDefault();
-            await createImport(form)
-            fetchExport()
-        } catch (error) {
-            console.log(error);
-        }
-    }
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-    const handleChange = async (e) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value
-        })
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await createImport(form);
+    fetchData();
+    setForm({ Food: "", Quantity: "" });
+  };
 
-    const handleDelete = async (_id) => {
-        try {
-            await deleteImport(_id);
-            alert("Import Deleted Successfully🍎->🗑️")
-            fetchExport();
-        } catch (error) {
-            console.log(error);
-            alert("Try Again🔃")
-        }
-    }
+  const handleChange = (field) => (e) => {
+    setForm({ ...form, [field]: e.target.value });
+  };
 
-    const handleUpdate = async (_id, data) => {
-        try {
-            await updateImport(_id, data)
-            alert("Import Updated Successfully🍓🍓-->🍎🍎😁😏")
-            fetchExport();
-        } catch (error) {
-            console.log(error);
-            alert("Try Again☠️🔃")
-        }
-    }
+  const handleDelete = async (_id) => {
+    if (!window.confirm("Delete this import?")) return;
+    await deleteImport(_id);
+    fetchData();
+  };
 
-    return(
+  const handleUpdate = async (_id, data) => {
+    await updateImport(_id, data);
+    fetchData();
+  };
+
+  return (
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-black text-white">
+
+      <NavBar />
+
+      <div className="p-6 max-w-7xl mx-auto space-y-8">
+
+        {/* HEADER */}
         <div>
-            <div>
-                <form onSubmit={handleSubmit}>
-                    <h2>Import🍎</h2>
-                    <input type="text" name="Food" placeholder="Enter Food-Name🍎" onChange={handleChange}/>
-                    <input type="text" name="Quantity" placeholder="Enter Owner-Name🍎" onChange={handleChange} />
-                    <button><FaPlus />Export</button>
-                </form>
-            </div>
-            <div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Food_Id</th>
-                            <th>Food_Name</th>
-                            <th>ImportDate</th>
-                            <th>Quantity</th>
-                        </tr>
-                    </thead>
-                    
-                    <tbody>
-                        {iport?.map((e) => (
-                            <tr key={e._id}>
-                                <td>{e._id}</td>
-                                <td>{e.Food?.Food_Name}</td>
-                                <td>{e.ImportDate}</td>
-                                <td>{e.Quantity}</td>
-                                <td>
-                                    <button onClick={async () => {
-                                        const newName = prompt(
-                                            "Enter New Name🍎",
-                                            e.Food_Name
-                                        );
-                                        const newQuantity = prompt(
-                                            "Enter New Quantity(Kg)",
-                                            e.Quantity
-                                        )
-                                        handleUpdate(
-                                            e._id, {
-                                                Food_Name: newName,
-                                                Quantity: newQuantity
-                                            }
-                                        )
-                                    }}>
-                                        <FaEdit/>Update
-                                    </button>
-                                </td>
-                                <td>
-                                    <button onClick={() => handleDelete(e._id)}>
-                                        <FaTrash/>Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+          <h1 className="text-4xl font-bold flex items-center gap-3">
+            <FaBoxOpen className="text-green-400" />
+            Import Management
+          </h1>
+          <p className="text-gray-400 mt-2">
+            Track incoming food stock into warehouse
+          </p>
         </div>
-    )
+
+        {/* FORM */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 grid md:grid-cols-2 gap-4"
+        >
+          <input
+            placeholder="Food"
+            value={form.Food}
+            onChange={handleChange("Food")}
+            className="input"
+          />
+
+          <input
+            placeholder="Quantity"
+            value={form.Quantity}
+            onChange={handleChange("Quantity")}
+            className="input"
+          />
+
+          <button className="md:col-span-2 bg-green-600 hover:bg-green-700 py-3 rounded-2xl flex items-center justify-center gap-2">
+            <FaPlus /> Add Import
+          </button>
+        </form>
+
+        {/* TABLE */}
+        <div className="bg-white/10 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/20">
+          <table className="w-full text-left">
+            <thead className="bg-white/10">
+              <tr>
+                <th className="p-4">Food</th>
+                <th className="p-4">Quantity</th>
+                <th className="p-4">Date</th>
+                <th className="p-4 text-center">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {iport?.map((e) => (
+                <tr key={e._id} className="border-t border-white/10 hover:bg-white/10">
+                  <td className="p-4">{e.Food?.Food_Name}</td>
+                  <td className="p-4 text-green-300">{e.Quantity}</td>
+                  <td className="p-4">
+                    {new Date(e.ImportDate).toLocaleDateString()}
+                  </td>
+
+                  <td className="p-4 flex gap-2 justify-center">
+
+                    <button
+                      onClick={() => {
+                        const q = prompt("New Quantity", e.Quantity);
+                        handleUpdate(e._id, { Quantity: q });
+                      }}
+                      className="bg-blue-600 px-3 py-1 rounded-lg"
+                    >
+                      <FaEdit />
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(e._id)}
+                      className="bg-red-600 px-3 py-1 rounded-lg"
+                    >
+                      <FaTrash />
+                    </button>
+
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  );
 }
 
 export default ImportPage;

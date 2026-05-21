@@ -1,121 +1,147 @@
 import { useState, useEffect } from "react";
-import { createExport, getExports, updateExport, deleteExport } from "../Api/ExportApi.js";
-import { FaEdit, FaTrash , FaPlus} from "react-icons/fa";
+import {
+  createExport,
+  getExports,
+  updateExport,
+  deleteExport,
+} from "../Api/ExportApi.js";
 
-function    ExportPage() {
-    const [form, setForm ] = useState({
-        Food: "",
-        Quantity: ""
-    })
-    const [eport, setEport ] = useState([]);
+import NavBar from "../Components/NavBar.jsx";
+import { FaEdit, FaTrash, FaPlus, FaTruck } from "react-icons/fa";
 
-    const fetchExport = async () => {
-       const response =  await getExports();
-       setEport(response.data.data )
-    };
+function ExportPage() {
+  const [form, setForm] = useState({
+    Food: "",
+    Quantity: "",
+  });
 
-    useEffect(() => {
-        fetchExport();
-    }, []);
+  const [eport, setEport] = useState([]);
 
-    const handleSubmit = async (e) => {
-        try {
-            e.preventDefault();
-            await createExport(form)
-            fetchExport()
-        } catch (error) {
-            console.log(error);
-        }
-    }
+  const fetchExport = async () => {
+    const response = await getExports();
+    setEport(response.data.data);
+  };
 
-    const handleChange = async (e) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value
-        })
-    }
+  useEffect(() => {
+    fetchExport();
+  }, []);
 
-    const handleDelete = async (_id) => {
-        try {
-            await deleteExport(_id);
-            alert("Export Deleted Successfully🍎->🗑️")
-            fetchExport();
-        } catch (error) {
-            console.log(error);
-            alert("Try Again🔃")
-        }
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await createExport(form);
+    fetchExport();
+    setForm({ Food: "", Quantity: "" });
+  };
 
-    const handleUpdate = async (_id, data) => {
-        try {
-            await updateExport(_id, data)
-            alert("Export Updated Successfully🍓🍓-->🍎🍎😁😏")
-            fetchExport();
-        } catch (error) {
-            console.log(error);
-            alert("Try Again☠️🔃")
-        }
-    }
+  const handleChange = (field) => (e) => {
+    setForm({ ...form, [field]: e.target.value });
+  };
 
-    return(
+  const handleDelete = async (_id) => {
+    const confirm = window.confirm("Delete this export?");
+    if (!confirm) return;
+
+    await deleteExport(_id);
+    fetchExport();
+  };
+
+  const handleUpdate = async (_id, data) => {
+    await updateExport(_id, data);
+    fetchExport();
+  };
+
+  return (
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-black text-white">
+
+      <NavBar />
+
+      <div className="p-6 max-w-7xl mx-auto space-y-8">
+
+        {/* HEADER */}
         <div>
-            <div>
-                <form onSubmit={handleSubmit}>
-                    <h2>Export</h2>
-                    <input type="text" name="Food" placeholder="Enter Food-Name🍎" onChange={handleChange}/>
-                    <input type="text" name="Quantity" placeholder="Enter Owner-Name🍎" onChange={handleChange} />
-                    <button><FaPlus />Export</button>
-                </form>
-            </div>
-            <div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Food_Id</th>
-                            <th>Food_Name</th>
-                            <th>Quantity</th>
-                        </tr>
-                    </thead>
-                    
-                    <tbody>
-                        {eport?.map((e) => (
-                            <tr key={e._id}>
-                                <td>{e._id}</td>
-                                <td>{e.Food?.Food_Name}</td>
-                                <td>{e.ExportDate}</td>
-                                <td>{e.Quantity}</td>
-                                <td>
-                                    <button onClick={async () => {
-                                        const newName = prompt(
-                                            "Enter New Name🍎",
-                                            e.Food_Name
-                                        );
-                                        const newQuantity = prompt(
-                                            "Enter New Quantity(Kg)",
-                                            e.Quantity
-                                        )
-                                        handleUpdate(
-                                            e._id, {
-                                                Food_Name: newName,
-                                                Quantity: newQuantity
-                                            }
-                                        )
-                                    }}>
-                                        <FaEdit/>Update
-                                    </button>
-                                </td>
-                                <td>
-                                    <button onClick={() => handleDelete(e._id)}>
-                                        <FaTrash/>Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+          <h1 className="text-4xl font-bold flex items-center gap-3">
+            <FaTruck className="text-purple-400" />
+            Export Management
+          </h1>
+          <p className="text-gray-400 mt-2">
+            Track all outgoing food exports from warehouse
+          </p>
         </div>
-    )
+
+        {/* FORM */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 grid md:grid-cols-2 gap-4"
+        >
+          <input
+            placeholder="Food ID / Name"
+            value={form.Food}
+            onChange={handleChange("Food")}
+            className="input"
+          />
+
+          <input
+            placeholder="Quantity"
+            value={form.Quantity}
+            onChange={handleChange("Quantity")}
+            className="input"
+          />
+
+          <button className="md:col-span-2 bg-purple-600 hover:bg-purple-700 py-3 rounded-2xl flex items-center justify-center gap-2">
+            <FaPlus /> Add Export
+          </button>
+        </form>
+
+        {/* TABLE */}
+        <div className="bg-white/10 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/20">
+          <table className="w-full text-left">
+            <thead className="bg-white/10">
+              <tr>
+                <th className="p-4">Food</th>
+                <th className="p-4">Quantity</th>
+                <th className="p-4">Export Date</th>
+                <th className="p-4 text-center">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {eport?.map((e) => (
+                <tr key={e._id} className="border-t border-white/10 hover:bg-white/10">
+                  <td className="p-4">{e.Food?.Food_Name}</td>
+                  <td className="p-4 text-purple-300">{e.Quantity}</td>
+                  <td className="p-4">
+                    {new Date(e.ExportDate).toLocaleDateString()}
+                  </td>
+
+                  <td className="p-4 flex gap-2 justify-center">
+
+                    <button
+                      onClick={() => {
+                        const newQty = prompt("New Quantity", e.Quantity);
+                        handleUpdate(e._id, { Quantity: newQty });
+                      }}
+                      className="bg-blue-600 px-3 py-1 rounded-lg"
+                    >
+                      <FaEdit />
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(e._id)}
+                      className="bg-red-600 px-3 py-1 rounded-lg"
+                    >
+                      <FaTrash />
+                    </button>
+
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  );
 }
 
 export default ExportPage;
