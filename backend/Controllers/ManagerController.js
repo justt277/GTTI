@@ -45,7 +45,12 @@ export const login = async (req, res) => {
         )
         return res.status(200).json({
             message: "Login Successfully",
-            token
+            token,
+            manager: {
+                id: Manager._id,
+                username: Manager.UserName,
+                role: "AdminStrator",
+            }
         })
     } catch (error) {
         res.status(500).json({

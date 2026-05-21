@@ -1,15 +1,14 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaArrowLeft, FaSignOutAlt, FaWarehouse } from "react-icons/fa";
+import { useState } from "react";
+import { FaArrowLeft, FaSignOutAlt, FaWarehouse, FaChevronDown } from "react-icons/fa";
 
 function NavBar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
-  const user = {
-    name: "JustIce",
-    role: "Food Manager",
-    avatar: "https://i.pravatar.cc/150?img=12",
-  };
+  // 👤 GET USER FROM LOCALSTORAGE
+  const manager = JSON.parse(localStorage.getItem("manager")) || {};
 
   const getTitle = () => {
     switch (location.pathname) {
@@ -23,6 +22,8 @@ function NavBar() {
         return "Export System";
       case "/Report":
         return "Reports";
+      case "/manager":
+        return "Manager Profile";
       default:
         return "GTTI System";
     }
@@ -30,53 +31,71 @@ function NavBar() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("manager"); 
     navigate("/", { replace: true });
   };
 
   return (
-    <nav className="w-full sticky top-0 z-50 bg-white/10 backdrop-blur-lg border-b border-white/10 text-white px-6 py-3 flex items-center justify-between shadow-xl">
+    <nav className="w-full sticky top-0 z-50 bg-white/10 backdrop-blur-lg border-b border-white/10 text-white px-6 py-3 flex items-center justify-between">
 
-      {/* 🏷️ LEFT TITLE */}
+      {/* TITLE */}
       <div className="flex items-center gap-3">
-        <FaWarehouse className="text-green-400 text-xl" />
-
-        <h1 className="text-xl md:text-2xl font-bold tracking-wide">
-          {getTitle()}
-        </h1>
+        <FaWarehouse className="text-green-400" />
+        <h1 className="text-xl font-bold">{getTitle()}</h1>
       </div>
 
-      {/* 👤 CENTER PROFILE */}
-      <div className="hidden md:flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full border border-white/10">
-        <img
-          src={user.avatar}
-          alt="profile"
-          className="w-9 h-9 rounded-full border-2 border-green-400"
-        />
-
-        <div className="leading-tight">
-          <p className="text-sm font-semibold">{user.name}</p>
-          <p className="text-xs text-gray-300">{user.role}</p>
-        </div>
-      </div>
-
-      {/* 🎮 ACTIONS */}
-      <div className="flex items-center gap-3">
+      {/* PROFILE */}
+      <div className="relative">
 
         <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition"
+          onClick={() => setOpen(!open)}
+          className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full"
         >
-          <FaArrowLeft />
-          Back
+          <img
+            src="https://i.pravatar.cc/150?img=12"
+            className="w-9 h-9 rounded-full border-2 border-green-400"
+          />
+
+          <div className="hidden md:block text-left">
+            <p className="text-sm font-semibold">
+              {manager?.username || "Guest"}
+            </p>
+            <p className="text-xs text-gray-300">
+              {manager?.role || "No Role"}
+            </p>
+          </div>
+
+          <FaChevronDown />
         </button>
 
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 transition shadow-lg"
-        >
-          <FaSignOutAlt />
-          Sign Out
-        </button>
+        {/* DROPDOWN */}
+        {open && (
+          <div className="absolute right-0 mt-3 w-72 bg-gray-900 border border-white/10 rounded-2xl shadow-xl">
+
+            <div className="p-4 border-b border-white/10">
+              <p className="font-bold">{manager?.username}</p>
+              <p className="text-xs text-gray-400">emmadi750@gmail.com</p>
+              <p className="text-xs text-gray-400">0792724949</p>
+              <p className="text-green-400 text-xs mt-1">{manager?.role}</p>
+            </div>
+
+            <button
+              onClick={() => navigate("/manager")}
+              className="w-full text-left px-4 py-3 hover:bg-white/10"
+            >
+              View Manager Profile
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-3 hover:bg-red-600/30 text-red-400"
+            >
+              <FaSignOutAlt className="inline mr-2" />
+              Sign Out
+            </button>
+
+          </div>
+        )}
 
       </div>
     </nav>

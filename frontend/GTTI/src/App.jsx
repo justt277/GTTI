@@ -7,6 +7,7 @@ import ExportPage from "./Pages/ExportPage.jsx";
 import Dashboard from "./Pages/Dashboard.jsx";
 import ReportPage from "./Pages/ReportPage.jsx";
 import { Routes, Route, Navigate } from "react-router-dom";
+import ManagerProfile from "./Pages/ManagerProfile.jsx";
 
 
 function App () {
@@ -21,6 +22,7 @@ function App () {
         <Route path="/Export" element={<ExportPage />}/>
         <Route path="/dashboard" element={<Dashboard />}/>
         <Route path="/Report" element={<ReportPage />}/>
+        <Route path="/manager" element={<ManagerProfile/>}/>
       </Routes>
     </div>
   )

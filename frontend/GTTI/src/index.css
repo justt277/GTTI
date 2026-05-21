@@ -1,1 +1,26 @@
 @import 'tailwindcss';
+
+.typing-text {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 3px solid #00ff99;
+  width: 0;
+  animation: typing 2.5s steps(20, end) forwards, blink 0.7s infinite;
+}
+
+/* typing effect */
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 200px;
+  }
+}
+
+/* blinking cursor */
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}
