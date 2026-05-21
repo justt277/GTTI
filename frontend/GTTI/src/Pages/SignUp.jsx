@@ -38,8 +38,8 @@ function SignUp() {
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl p-8 space-y-6"
       >
-        <h2 className="text-3xl font-bold text-center">
-          🧬 Create Manager Account
+        <h2 className="typing-text text-3xl font-bold text-center">
+          🧬Register Portal
         </h2>
 
         {/* USERNAME */}
